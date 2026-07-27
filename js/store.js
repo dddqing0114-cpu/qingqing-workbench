@@ -5,7 +5,7 @@ const Store = {
 
   defaults() {
     return {
-      profile: { name: '筱', hospital: '' },
+      profile: { name: '筱', hospital: '', signature: '', avatar: null },
       schedule: {
         // 'YYYY-MM-DD': '班次名'
         shifts: {},
@@ -29,9 +29,14 @@ const Store = {
         // 每个单词的学习状态: { idx: {level: 0-5, next: 'YYYY-MM-DD', seen: n} }
         progress: {},
         dailyGoal: 20,
-        log: {}             // 'YYYY-MM-DD': 学习个数
+        log: {},            // 'YYYY-MM-DD': 学习个数
+        phraseFam: {}       // 高频词组熟悉标记: { idx: true }
       },
-      plans: {}            // 'YYYY-MM-DD': [{id, text, done}]
+      plans: {},           // 'YYYY-MM-DD': [{id, text, done}]
+      fridge: {
+        fresh: [],          // 冷藏食材: [{id, name, qty}]
+        frozen: []          // 冷冻食材: [{id, name, qty}]
+      }
     };
   },
 
@@ -61,6 +66,38 @@ const Store = {
     a.href = URL.createObjectURL(blob);
     a.download = '工作台备份-' + Util.today() + '.json';
     a.click();
+  },
+
+  // 导出为可复制文本（iOS 主屏下 download 可能被拦，复制/分享更可靠）
+  exportModal() {
+    const json = JSON.stringify(this.data, null, 2);
+    UI.modal(`
+      <h3>导出数据备份</h3>
+      <p class="muted">复制下面的文本保存（备忘录 / 微信文件传输助手 / 「文件」App 均可）。换手机或清空浏览器后，粘贴回来即可恢复，原有数据不丢。</p>
+      <textarea class="bk-text" readonly onclick="this.select()">${Util.esc(json)}</textarea>
+      <button class="btn" onclick="Store.copyBackup()">📋 复制文本</button>
+      <button class="btn ghost mt8" onclick="Store.shareBackup()">📤 分享为文件</button>
+      <button class="btn ghost mt8" onclick="UI.closeModal()">关闭</button>`);
+  },
+
+  copyBackup() {
+    const ta = document.querySelector('.bk-text');
+    const done = () => UI.toast('已复制 ✓');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(done).catch(() => { ta.select(); document.execCommand('copy'); done(); });
+    } else { ta.select(); document.execCommand('copy'); done(); }
+  },
+
+  shareBackup() {
+    const json = JSON.stringify(this.data, null, 2);
+    try {
+      const file = new File([json], '工作台备份-' + Util.today() + '.json', { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: '工作台备份' }).catch(() => {});
+      } else if (navigator.share) {
+        navigator.share({ title: '工作台备份', text: json }).catch(() => {});
+      } else { UI.toast('当前环境不支持分享，请复制文本'); }
+    } catch (e) { UI.toast('当前环境不支持分享，请复制文本'); }
   },
 
   import(json) {
@@ -107,10 +144,20 @@ const Util = {
   esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   },
-  // 班次显示美化：补休=休息，日历上更直观
+  // 班次显示美化：下夜 / 下补 / 补休 统一显示为「休」
   shiftLabel(s) {
     if (!s) return s;
-    if (/补休/.test(s)) return '休';
+    if (/下夜|下补|补休/.test(s)) return '休';
     return s;
+  },
+  // 班次类型 → 颜色类别：休=绿、白班=粉、夜班=橘、读片=红（其余默认主色）
+  shiftKind(s) {
+    if (!s) return '';
+    if (/休|下夜|下补/.test(s)) return 'rest';
+    if (/夜/.test(s)) return 'night';
+    if (/读片|读/.test(s)) return 'read';
+    if (/白班/.test(s)) return 'day';
+    if (/急诊|副班/.test(s)) return 'redborder';
+    return '';
   }
 };
