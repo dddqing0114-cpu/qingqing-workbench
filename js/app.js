@@ -35,6 +35,9 @@ const App = {
       <div class="field mt12"><label>个性签名（显示在首页绿框，可随时修改）</label>
         <input id="setSig" value="${Util.esc(Store.data.profile.signature)}" maxlength="30" placeholder="例如：今天也要元气满满 💪"></div>
       <button class="btn" onclick="App.saveSettings()">保存</button>
+      <div class="card-title mt16">应用更新</div>
+      <p class="muted" style="margin-bottom:10px">主屏图标打开的应用没有刷新按钮。点此可重新加载最新版本，不会丢失任何数据。</p>
+      <button class="btn ghost" onclick="App.refresh()">🔄 刷新 / 检查更新</button>
       <div class="card-title mt16">数据管理</div>
       <p class="muted" style="margin-bottom:10px">所有数据仅保存在本机浏览器中。建议定期导出备份，防止清理浏览器数据时丢失。</p>
       <button class="btn ghost" onclick="Store.exportModal()">📤 导出数据备份</button>
@@ -46,6 +49,11 @@ const App = {
     Store.data.profile.signature = document.getElementById('setSig').value.trim();
     Store.save(); UI.closeModal(); Today.render();
     UI.toast('已保存 ✓');
+  },
+
+  refresh() {
+    UI.toast('正在刷新最新版本…');
+    setTimeout(() => { location.reload(true); }, 400);
   },
 
   editSignature() {
