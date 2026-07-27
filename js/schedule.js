@@ -1,7 +1,7 @@
 /* ===== 排班模块：Excel / Word 导入 + 月历 ===== */
 const Schedule = {
   viewYear: null, viewMonth: null, selectedDate: null,
-  libVer: '?v=20260727k',
+  libVer: '?v=20260727u',
   _libsPromise: null,
 
   init() {
@@ -49,10 +49,15 @@ const Schedule = {
       const other = d.getMonth() !== this.viewMonth;
       const cls = ['cal-day', other ? 'other' : '', ds === today ? 'today' : '', ds === this.selectedDate ? 'selected' : ''].join(' ');
       const shift = shifts[ds];
-      const tagCls = mine[ds] ? 'shift-tag mine' : 'shift-tag';
+      const parts = shift ? shift.split(' / ') : [];
+      const tagHTML = parts.map(part => {
+        const isMine = mine[ds] ? ' mine' : '';
+        const kind = Util.shiftKind(part);
+        return `<span class="shift-tag${isMine}${kind ? ' sk-' + kind : ''}">${Util.esc(Util.shiftLabel(part))}</span>`;
+      }).join('');
       html += `<div class="${cls}" onclick="Schedule.pick('${ds}')">
         <span>${d.getDate()}</span>
-        ${shift ? `<span class="${tagCls}">${Util.esc(Util.shiftLabel(shift))}</span>` : ''}
+        ${tagHTML ? `<div class="shift-tags">${tagHTML}</div>` : ''}
       </div>`;
     }
     return html;
@@ -68,7 +73,11 @@ const Schedule = {
         <span class="more" onclick="Schedule.editDay('${ds}')">${shift ? '修改' : '添加班次'}</span>
       </div>
       ${shift
-        ? `<div class="${cls}" style="font-size:20px;font-weight:700;color:var(--primary-dark)">${Util.esc(Util.shiftLabel(shift))}</div>`
+        ? `<div class="${cls}" style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">${shift.split(' / ').map(part => {
+            const k = Util.shiftKind(part);
+            const m = mine[ds] ? ' mine' : '';
+            return `<span class="shift-detail${m}${k ? ' sk-' + k : ''}">${Util.esc(Util.shiftLabel(part))}</span>`;
+          }).join('')}</div>`
         : `<div class="muted">这天暂无排班记录</div>`}`;
   },
 
