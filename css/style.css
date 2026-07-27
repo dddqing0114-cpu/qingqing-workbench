@@ -215,20 +215,22 @@ html, body {
   border: none; background: var(--bg); border-radius: 10px;
   width: 32px; height: 32px; font-size: 15px; color: var(--text-2); cursor: pointer;
 }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .cal-week { text-align: center; font-size: 11px; color: var(--text-3); padding: 4px 0; }
 .cal-day {
   aspect-ratio: 1/1.15; border-radius: 10px; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 2px; cursor: pointer;
   font-size: 14px; position: relative; border: 1.5px solid transparent;
+  min-width: 0; overflow: hidden;
 }
 .cal-day.other { opacity: .3; }
 .cal-day.today { border-color: var(--primary); }
 .cal-day.selected { background: var(--primary); color: #fff; }
 .cal-day .shift-tag {
-  font-size: 9px; padding: 1px 5px; border-radius: 6px;
+  font-size: 8px; padding: 1px 3px; border-radius: 5px;
   background: var(--primary-light); color: var(--primary-dark);
-  max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 100%; width: 100%; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; text-align: center;
 }
 .cal-day .shift-tag.mine {
   background: #fce7f3; color: #db2777; border: 1px solid #f9a8d4;
@@ -303,3 +305,11 @@ html, body {
 .mt8 { margin-top: 8px; } .mt12 { margin-top: 12px; } .mt16 { margin-top: 16px; }
 .center { text-align: center; }
 .muted { color: var(--text-3); font-size: 12px; }
+
+/* 小屏日历防溢出 */
+@media (max-width: 380px) {
+  #main { padding-left: 10px; padding-right: 10px; }
+  .card { padding: 12px; }
+  .cal-day { font-size: 13px; }
+  .cal-week { font-size: 10px; }
+}
