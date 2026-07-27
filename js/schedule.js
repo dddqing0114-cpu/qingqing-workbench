@@ -1,6 +1,8 @@
 /* ===== 排班模块：Excel / Word 导入 + 月历 ===== */
 const Schedule = {
   viewYear: null, viewMonth: null, selectedDate: null,
+  libVer: '?v=20260727k',
+  _libsPromise: null,
 
   init() {
     const now = new Date();
@@ -112,11 +114,34 @@ const Schedule = {
     });
   },
 
+  /* ---------- 动态加载解析库（仅在导入时才加载，节省首屏） ---------- */
+  loadLibs() {
+    if (this._libsPromise) return this._libsPromise;
+    this._libsPromise = Promise.all([
+      this._loadScript('lib/xlsx.full.min.js' + this.libVer),
+      this._loadScript('lib/mammoth.browser.min.js' + this.libVer)
+    ]);
+    return this._libsPromise;
+  },
+  _loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) return resolve();
+      const s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('加载失败: ' + src));
+      document.body.appendChild(s);
+    });
+  },
+
   /* ---------- 文件入口：按后缀分流 ---------- */
-  onFile(input) {
+  async onFile(input) {
     const file = input.files[0];
     input.value = '';
     if (!file) return;
+    try {
+      await this.loadLibs();
+    } catch (e) { return UI.toast('解析库加载失败，请检查网络后重试'); }
     const lower = file.name.toLowerCase();
     if (lower.endsWith('.docx')) return this.onWordFile(file);
     if (lower.endsWith('.doc')) return UI.toast('暂不支持 .doc 老格式，请先在 Word 里「另存为 .docx」再导入');
