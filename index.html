@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>青青的工作台</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="青青工作台">
+<meta name="theme-color" content="#0e9f8a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png?v=20260727j">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="topbar-btn" id="menuBtn" title="菜单" aria-label="菜单">☰</button>
+  <div class="topbar-title" id="topbarTitle">今日</div>
+  <button class="topbar-btn" id="settingsBtn" title="设置">⚙︎</button>
+</header>
+
+<main id="main">
+  <section class="page" id="page-today"></section>
+  <section class="page" id="page-schedule"></section>
+  <section class="page" id="page-health"></section>
+  <section class="page" id="page-words"></section>
+  <section class="page" id="page-plan"></section>
+</main>
+
+<nav class="tabbar">
+  <button class="tab active" data-page="today"><span class="tab-icon">☀️</span><span>今日</span></button>
+  <button class="tab" data-page="schedule"><span class="tab-icon">📅</span><span>排班</span></button>
+  <button class="tab" data-page="words"><span class="tab-icon">📖</span><span>单词</span></button>
+  <button class="tab" data-page="plan"><span class="tab-icon">✅</span><span>计划</span></button>
+</nav>
+
+<!-- 左侧抽屉导航 -->
+<div class="sidebar-mask" id="sidebarMask"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <img src="icon-180.png?v=20260727j" class="s-logo" alt="">
+    <div>
+      <div class="s-name">青青的工作台</div>
+      <div class="s-sub" id="sidebarSub">筱 的工作台</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="sidebar-item active" data-page="today"><span class="s-ico">☀️</span><span>今日</span></button>
+    <button class="sidebar-item" data-page="schedule"><span class="s-ico">📅</span><span>排班</span></button>
+    <button class="sidebar-item" data-page="health"><span class="s-ico">💪</span><span>健康</span></button>
+    <button class="sidebar-item" data-page="words"><span class="s-ico">📖</span><span>单词</span></button>
+    <button class="sidebar-item" data-page="plan"><span class="s-ico">✅</span><span>计划</span></button>
+  </nav>
+  <div class="sidebar-foot">
+    <button class="btn ghost small" id="sidebarSettings" style="width:100%">⚙︎ 设置</button>
+  </div>
+</aside>
+
+<!-- 通用弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="lib/xlsx.full.min.js?v=20260727j"></script>
+<script src="lib/mammoth.browser.min.js?v=20260727j"></script>
+<script src="data/words-data.js?v=20260727j"></script>
+<script src="data/words-data2.js?v=20260727j"></script>
+<script src="data/words-data3.js?v=20260727j"></script>
+<script src="js/store.js?v=20260727j"></script>
+<script src="js/ui.js?v=20260727j"></script>
+<script src="js/schedule.js?v=20260727j"></script>
+<script src="js/health.js?v=20260727j"></script>
+<script src="js/words.js?v=20260727j"></script>
+<script src="js/plan.js?v=20260727j"></script>
+<script src="js/today.js?v=20260727j"></script>
+<script src="js/app.js?v=20260727j"></script>
+</body>
+</html>
