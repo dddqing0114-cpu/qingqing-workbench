@@ -4,6 +4,7 @@ const Today = {
     const el = document.getElementById('page-today');
     const t = Util.today();
     const name = Store.data.profile.name;
+    const sig = Store.data.profile.signature;
     const shift = Store.data.schedule.shifts[t];
     const tomorrow = Store.data.schedule.shifts[Util.addDays(t, 1)];
     const mine = Store.data.schedule.mine || {};
@@ -28,10 +29,13 @@ const Today = {
 
     el.innerHTML = `
       <div class="hero">
-        <div class="date">${t} · 周${Util.weekCN(t)}</div>
-        <div class="greet">${greet}${name ? '，' + Util.esc(name) : ''} 👋</div>
-        <div class="shift-chip ${mine[t] ? 'mine' : ''}">${shift ? '今日班次：' + Util.esc(Util.shiftLabel(shift)) : '今日暂无排班记录'}</div>
-        ${tomorrow ? `<div style="font-size:12px;opacity:.8;margin-top:8px">明天：${Util.esc(Util.shiftLabel(tomorrow))}</div>` : ''}
+        <div class="hero-main">
+          <div class="date">${t} · 周${Util.weekCN(t)}</div>
+          <div class="greet" onclick="App.editSignature()" title="点此修改个性签名">${sig ? Util.esc(sig) : (greet + (name ? '，' + Util.esc(name) : '') + ' 👋')}</div>
+          <div class="shift-chip ${mine[t] ? 'mine' : ''}${shift ? ' sk-' + Util.shiftKind(shift) : ''}">${shift ? '今日班次：' + Util.esc(Util.shiftLabel(shift)) : '今日暂无排班记录'}</div>
+          ${tomorrow ? `<div style="font-size:12px;margin-top:8px">明天：${Util.esc(Util.shiftLabel(tomorrow))}</div>` : ''}
+        </div>
+        <img class="hero-avatar" src="${Store.data.profile.avatar || 'shuyuan.png?v=20260727u'}" alt="书源" title="点此更换照片" onclick="Today.changeAvatar()">
       </div>
 
       <div class="grid2">
@@ -72,5 +76,40 @@ const Today = {
     const t = Util.today();
     const it = (Store.data.plans[t] || []).find(x => x.id === id);
     if (it) { it.done = !it.done; Store.save(); this.render(); }
+  },
+
+  // 点击书源照片 → 选择本地图片 → 压缩后存入 localStorage（固定、不丢）
+  changeAvatar() {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    inp.onchange = () => {
+      const file = inp.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const max = 320;
+          const scale = Math.min(max / img.width, max / img.height, 1);
+          const cw = Math.max(1, Math.round(img.width * scale));
+          const ch = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+          try {
+            Store.data.profile.avatar = canvas.toDataURL('image/jpeg', 0.85);
+            Store.save();
+            Today.render();
+            UI.toast('照片已更新 ✓');
+          } catch (err) {
+            UI.toast('图片太大无法保存，换张小一点的');
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+    inp.click();
   }
 };
