@@ -35,7 +35,7 @@ const Today = {
           <div class="shift-chip ${mine[t] ? 'mine' : ''}${shift ? ' sk-' + Util.shiftKind(shift) : ''}">${shift ? '今日班次：' + Util.esc(Util.shiftLabel(shift)) : '今日暂无排班记录'}</div>
           ${tomorrow ? `<div style="font-size:12px;margin-top:8px">明天：${Util.esc(Util.shiftLabel(tomorrow))}</div>` : ''}
         </div>
-        <img class="hero-avatar" src="${Store.data.profile.avatar || 'shuyuan.png?v=20260727u'}" alt="书源" title="点此更换照片" onclick="Today.changeAvatar()">
+        <img class="hero-avatar" src="${Store.data.profile.avatar || window.AVATAR_DEFAULT}" alt="书源" title="点此更换照片" onclick="Today.changeAvatar()" onerror="Today.avatarFallback(this)">
       </div>
 
       <div class="grid2">
@@ -111,5 +111,10 @@ const Today = {
       reader.readAsDataURL(file);
     };
     inp.click();
+  },
+  // 头像加载失败时的兜底：内嵌占位图，绝不再显示乱码
+  avatarFallback(img) {
+    img.onerror = null;
+    img.src = 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22150%22%20height=%22150%22%3E%3Crect%20width=%22150%22%20height=%22150%22%20fill=%22%23bbf7d0%22/%3E%3Ctext%20x=%2275%22%20y=%2295%22%20font-size=%2270%22%20text-anchor=%22middle%22%3E%F0%9F%91%A9%3C/text%3E%3C/svg%3E';
   }
 };
