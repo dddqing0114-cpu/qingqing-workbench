@@ -1,6 +1,6 @@
 /* ===== 应用入口与导航（左侧抽屉） ===== */
 const App = {
-  titles: { today: '今日', schedule: '排班', health: '健康', words: '单词', plan: '每日计划' },
+  titles: { today: '今日', schedule: '排班', health: '健康', words: '单词', plan: '每日计划', fridge: '冰箱' },
   curPage: 'today',
 
   go(page) {
@@ -8,7 +8,7 @@ const App = {
     document.querySelectorAll('.tab, .sidebar-item').forEach(b => b.classList.toggle('active', b.dataset.page === page));
     document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
     document.getElementById('topbarTitle').textContent = this.titles[page];
-    const mod = { today: Today, schedule: Schedule, health: Health, words: Words, plan: Plan }[page];
+    const mod = { today: Today, schedule: Schedule, health: Health, words: Words, plan: Plan, fridge: Fridge }[page];
     if (mod && mod.render) mod.render();
     window.scrollTo(0, 0);
     this.closeSidebar();
@@ -32,18 +32,29 @@ const App = {
       <h3>设置</h3>
       <div class="field"><label>我的姓名（用于排班识别）</label>
         <input id="setName" value="${Util.esc(Store.data.profile.name)}"></div>
+      <div class="field mt12"><label>个性签名（显示在首页绿框，可随时修改）</label>
+        <input id="setSig" value="${Util.esc(Store.data.profile.signature)}" maxlength="30" placeholder="例如：今天也要元气满满 💪"></div>
       <button class="btn" onclick="App.saveSettings()">保存</button>
       <div class="card-title mt16">数据管理</div>
       <p class="muted" style="margin-bottom:10px">所有数据仅保存在本机浏览器中。建议定期导出备份，防止清理浏览器数据时丢失。</p>
-      <button class="btn ghost" onclick="Store.export()">📤 导出数据备份</button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="App.onImport(this)">
-      <button class="btn ghost mt8" onclick="document.getElementById('importFile').click()">📥 恢复备份</button>`);
+      <button class="btn ghost" onclick="Store.exportModal()">📤 导出数据备份</button>
+      <button class="btn ghost mt8" onclick="App.showRestore()">📥 恢复备份</button>`);
   },
 
   saveSettings() {
     Store.data.profile.name = document.getElementById('setName').value.trim();
+    Store.data.profile.signature = document.getElementById('setSig').value.trim();
     Store.save(); UI.closeModal(); Today.render();
     UI.toast('已保存 ✓');
+  },
+
+  editSignature() {
+    const cur = Store.data.profile.signature || '';
+    const v = prompt('编辑个性签名（显示在首页绿框，留空则恢复默认问候）', cur);
+    if (v === null) return;
+    Store.data.profile.signature = v.trim();
+    Store.save(); Today.render();
+    UI.toast('已更新 ✓');
   },
 
   onImport(input) {
@@ -60,6 +71,26 @@ const App = {
     };
     r.readAsText(f);
     input.value = '';
+  },
+
+  showRestore() {
+    UI.modal(`
+      <h3>恢复数据备份</h3>
+      <p class="muted">① 选择备份文件，或 ② 粘贴之前复制的备份文本，再点「恢复」。恢复时新旧数据自动合并保留，不会互相覆盖。</p>
+      <input type="file" id="importFile" accept=".json" class="mt8" onchange="App.onImport(this)">
+      <div class="card-title mt16">或粘贴备份文本</div>
+      <textarea id="importText" class="bk-text" placeholder="在此粘贴备份文本…"></textarea>
+      <button class="btn" onclick="App.restoreFromText()">恢复</button>
+      <button class="btn ghost mt8" onclick="UI.closeModal()">取消</button>`);
+  },
+
+  restoreFromText() {
+    const t = document.getElementById('importText').value.trim();
+    if (!t) { UI.toast('请先粘贴备份文本'); return; }
+    try {
+      Store.import(t);
+      UI.closeModal(); App.go('today'); UI.toast('恢复成功 ✓');
+    } catch (e) { UI.toast('文本格式不正确'); }
   },
 
   init() {
