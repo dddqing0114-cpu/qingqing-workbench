@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="青青工作台">
 <meta name="theme-color" content="#0e9f8a">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-180.png?v=20260727z">
+<link rel="apple-touch-icon" href="icon-180.png?v=20260727aa">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -41,7 +41,7 @@
 <div class="sidebar-mask" id="sidebarMask"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-head">
-    <img src="icon-180.png?v=20260727z" class="s-logo" alt="">
+    <img src="icon-180.png?v=20260727aa" class="s-logo" alt="">
     <div>
       <div class="s-name">青青的工作台</div>
       <div class="s-sub" id="sidebarSub">筱 的工作台</div>
@@ -67,19 +67,28 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data/words-data.js?v=20260727z" defer></script>
-<script src="data/words-data2.js?v=20260727z" defer></script>
-<script src="data/words-data3.js?v=20260727z" defer></script>
-<script src="data/phrases-data.js?v=20260727z" defer></script>
-<script src="js/store.js?v=20260727z" defer></script>
-<script src="js/ui.js?v=20260727z" defer></script>
-<script src="js/schedule.js?v=20260727z" defer></script>
-<script src="js/health.js?v=20260727z" defer></script>
-<script src="js/words.js?v=20260727z" defer></script>
-<script src="js/plan.js?v=20260727z" defer></script>
-    <script src="js/avatar-default.js?v=20260727z" defer></script>
-    <script src="js/today.js?v=20260727z" defer></script>
-    <script src="js/fridge.js?v=20260727z" defer></script>
-    <script src="js/app.js?v=20260727z" defer></script>
+<script src="data/words-data.js?v=20260727aa" defer></script>
+<script src="data/words-data2.js?v=20260727aa" defer></script>
+<script src="data/words-data3.js?v=20260727aa" defer></script>
+<script src="data/phrases-data.js?v=20260727aa" defer></script>
+<script src="js/store.js?v=20260727aa" defer></script>
+<script src="js/ui.js?v=20260727aa" defer></script>
+<script src="js/schedule.js?v=20260727aa" defer></script>
+<script src="js/health.js?v=20260727aa" defer></script>
+<script src="js/words.js?v=20260727aa" defer></script>
+<script src="js/plan.js?v=20260727aa" defer></script>
+    <script src="js/avatar-default.js?v=20260727aa" defer></script>
+    <script src="js/today.js?v=20260727aa" defer></script>
+    <script src="js/fridge.js?v=20260727aa" defer></script>
+    <script src="js/app.js?v=20260727aa" defer></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js?v=20260727aa').catch(function (e) {
+        console.warn('Service Worker 注册失败:', e);
+      });
+    });
+  }
+</script>
 </body>
 </html>
